@@ -29,16 +29,71 @@ library and have people open `index.html`.
 
 Your work auto-saves in the browser, so it's still there when you reopen the page.
 
-**Building blocks (tuned for Copilot Agents)**
+**Building blocks (tuned for Copilot Studio agents)**
+
+The palette mirrors the building blocks you'd assemble in Copilot Studio,
+grouped by purpose.
+
+_Entry points_
 
 | Block | What it represents |
 | --- | --- |
-| ⚡ Trigger | How the agent starts (a user message, a schedule, an email, a form…) |
-| 📚 Knowledge Source | Data the agent reads to ground answers (SharePoint, a website, a database…) |
+| ⚡ Trigger | How the agent starts (a user message, a schedule, an event, an email, a form…) |
+| 💬 Topic | A reusable conversation unit matched by intent / phrases — can be the trigger itself |
+
+_Reasoning_
+
+| Block | What it represents |
+| --- | --- |
 | 🧠 Agent Instructions | The model + prompt that define how the agent reasons |
-| ⚙️ Action / Tool | Something the agent does (send email, create a record, call an API…) |
+| ✨ Prompt (AI Builder) | A custom AI prompt that transforms input or generates content ("New prompt") |
+
+_Knowledge & data_
+
+| Block | What it represents |
+| --- | --- |
+| 📚 Knowledge Source | Data the agent reads to ground answers (SharePoint, a website, a database…) |
+| 🏷️ Entity | What information to recognize and extract from user input |
+
+_Conversation flow_
+
+| Block | What it represents |
+| --- | --- |
+| ❓ Ask a Question | Prompts the user for input and captures it (with slot / entity filling) |
+| 🟰 Set Variable | Assigns or updates a variable used later in the flow |
+| 🔧 Parse Value | Converts a value into a typed variable (text, number, JSON, record, table…) |
 | 🔀 Condition / Branch | Logic that routes the flow based on a rule |
+| ↪️ Redirect to Topic | Hands the conversation off to another topic |
+
+_Tools & extensibility_
+
+| Block | What it represents |
+| --- | --- |
+| ⚙️ Action / Tool | Something the agent does (send email, create a record, call an API…) |
+| 🔌 Connector | A Power Platform, custom, or MCP connector action |
+| 🌊 Agent Flow | A built-in Power Automate-style flow for deterministic automation |
+| 🧩 Skill | A connected skill that adds capabilities or actions |
+
+_Multi-agent orchestration_
+
+| Block | What it represents |
+| --- | --- |
+| 🤖 Child Agent | Delegates a specialized task to a connected agent, then returns |
+| 🕸️ Multi-Agent Orchestration | Routes work across multiple agents to the best-suited one |
+
+_Identity & escalation_
+
+| Block | What it represents |
+| --- | --- |
+| 🔐 Authentication | Requires the user to sign in before continuing |
+| 🙋 Transfer to Human | Escalates the conversation to a live human agent |
+
+_Delivery & publishing_
+
+| Block | What it represents |
+| --- | --- |
 | 📤 Output / Response | What the user finally receives back |
+| 📡 Channel / Publish | Where the agent is surfaced (Teams, M365 Copilot, web, voice…) |
 
 **Export / hand off**
 - **Export JSON** — a machine-readable definition (re-import it later with *Import*).
@@ -52,8 +107,10 @@ Your work auto-saves in the browser, so it's still there when you reopen the pag
 
 All node types live in **`js/nodeTypes.js`**. To add or change a building block,
 edit that one file — add an entry with an `icon`, `color`, `description`, and a
-list of `fields`. The palette, the node card, the property panel, and the
-requirements export all update automatically.
+list of `fields`, then list its key in `NODE_ORDER`. The palette, the node card,
+the property panel, and the requirements export all update automatically.
+
+Fields support three input types: `text`, `textarea`, and `select` (with `options`).
 
 ```
 copilot-workflow-designer/
