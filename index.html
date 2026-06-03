@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- ============ TOP TOOLBAR ============ -->
   <header class="toolbar">
     <div class="toolbar-left">
+      <button class="btn mobile-only" id="btnTogglePalette" title="Show Blocks">☰ Blocks</button>
+      
       <span class="brand">
         <span class="brand-dot"></span>
         Copilot Agent Workflow Designer
@@ -17,18 +18,19 @@
       <input id="workflowName" class="workflow-name" type="text" value="Untitled workflow" spellcheck="false" />
     </div>
     <div class="toolbar-right">
+      <button class="btn mobile-only" id="btnTogglePanel" title="Show Properties">⚙️ Edit</button>
+      
       <button class="btn" id="btnNew" title="Start a blank workflow">New</button>
       <button class="btn" id="btnImport" title="Load a saved .json workflow">Import</button>
       <input type="file" id="fileImport" accept="application/json" hidden />
-      <span class="divider"></span>
-      <button class="btn" id="btnExportJson" title="Download workflow as JSON">Export JSON</button>
-      <button class="btn" id="btnExportPng" title="Download diagram as a PNG image">Export PNG</button>
+      <span class="divider hide-mobile"></span>
+      <button class="btn hide-mobile" id="btnExportJson" title="Download workflow as JSON">Export JSON</button>
+      <button class="btn hide-mobile" id="btnExportPng" title="Download diagram as a PNG image">Export PNG</button>
       <button class="btn btn-primary" id="btnExportDoc" title="Download a developer requirements document">Requirements Doc</button>
     </div>
   </header>
 
   <div class="layout">
-    <!-- ============ LEFT PALETTE ============ -->
     <aside class="palette" id="palette">
       <div class="palette-title">Building Blocks</div>
       <div class="palette-hint">Drag onto the canvas, or click to add.</div>
@@ -45,7 +47,6 @@
       </div>
     </aside>
 
-    <!-- ============ CENTER CANVAS ============ -->
     <main class="canvas-wrap">
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -72,7 +73,6 @@
       </div>
     </main>
 
-    <!-- ============ RIGHT PROPERTY PANEL ============ -->
     <aside class="panel" id="panel">
       <div class="panel-empty" id="panelEmpty">
         <div class="panel-empty-icon">⚙️</div>

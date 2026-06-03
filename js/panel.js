@@ -24,7 +24,13 @@
         e.dataTransfer.setData("text/node-type", type);
         e.dataTransfer.effectAllowed = "copy";
       });
-      item.addEventListener("click", () => window.Editor.addNodeCenter(type));
+      item.addEventListener("click", () => {
+        window.Editor.addNodeCenter(type);
+        // NEW: On mobile, close palette after adding so user can see canvas
+        if (window.innerWidth <= 850) {
+          document.getElementById("palette").classList.remove("open");
+        }
+      });
       host.appendChild(item);
     });
   }

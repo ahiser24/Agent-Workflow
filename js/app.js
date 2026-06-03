@@ -131,9 +131,41 @@
     window.Panel.buildPalette();
     window.Editor.init({
       onChange: () => { persist(); },
-      onSelect: (sel) => { window.Panel.renderPanel(sel); }
+      onSelect: (sel) => { 
+        window.Panel.renderPanel(sel); 
+        // NEW: Auto-open panel on mobile when a node is selected
+        if (sel && window.innerWidth <= 850) {
+          document.getElementById("panel").classList.add("open");
+          document.getElementById("palette").classList.remove("open");
+        }
+      }
     });
     wireToolbar();
+
+    // NEW: Mobile Toggle Buttons logic
+    const btnPalette = document.getElementById("btnTogglePalette");
+    const btnPanel = document.getElementById("btnTogglePanel");
+    const palette = document.getElementById("palette");
+    const panel = document.getElementById("panel");
+    const canvas = document.getElementById("canvas");
+
+    if (btnPalette) btnPalette.addEventListener("click", () => {
+      palette.classList.toggle("open");
+      panel.classList.remove("open");
+    });
+    
+    if (btnPanel) btnPanel.addEventListener("click", () => {
+      panel.classList.toggle("open");
+      palette.classList.remove("open");
+    });
+
+    // NEW: Close panels when tapping empty canvas space on mobile
+    if (canvas) canvas.addEventListener("pointerdown", (e) => {
+      if (window.innerWidth <= 850 && (e.target.id === "canvas" || e.target.id === "gridRect")) {
+        palette.classList.remove("open");
+        panel.classList.remove("open");
+      }
+    });
 
     const restored = loadSaved();
     if (!restored) seedSample();
