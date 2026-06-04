@@ -26,11 +26,21 @@
       <button class="btn" id="btnNew" title="Start a blank workflow">New</button>
       <button class="btn" id="btnImport" title="Load a saved .json workflow">Import</button>
       <input type="file" id="fileImport" accept="application/json" hidden />
-      <span class="divider hide-mobile"></span>
-      <button class="btn hide-mobile" id="btnExportJson" title="Download workflow as JSON">Export JSON</button>
-      <button class="btn hide-mobile" id="btnExportPng" title="Download diagram as a PNG image">Export PNG</button>
-      <button class="btn btn-primary" id="btnExportDoc" title="Download a developer requirements document">Requirements
-        Doc</button>
+      <span class="divider"></span>
+      <div class="dropdown">
+        <button class="btn btn-primary" id="btnExportToggle" title="Export workflow options">Export ▾</button>
+        <div class="dropdown-menu" id="exportDropdownMenu">
+          <button class="dropdown-item" id="btnExportJson" title="Download workflow as JSON">
+            <span class="dropdown-icon">{ }</span> Export JSON
+          </button>
+          <button class="dropdown-item" id="btnExportPng" title="Download diagram as a PNG image">
+            <span class="dropdown-icon">🖼️</span> Export PNG
+          </button>
+          <button class="dropdown-item" id="btnExportDoc" title="Download a developer requirements document">
+            <span class="dropdown-icon">📝</span> Requirements Doc
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 

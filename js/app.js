@@ -104,6 +104,17 @@
     document.getElementById("btnExportPng").addEventListener("click", () => window.Exporters.exportPng());
     document.getElementById("btnExportDoc").addEventListener("click", () => window.Exporters.exportDoc());
 
+    const exportToggle = document.getElementById("btnExportToggle");
+    const exportMenu = document.getElementById("exportDropdownMenu");
+    exportToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      exportMenu.classList.toggle("show");
+    });
+    document.addEventListener("click", () => {
+      exportMenu.classList.remove("show");
+    });
+
+
     const fileInput = document.getElementById("fileImport");
     document.getElementById("btnImport").addEventListener("click", () => fileInput.click());
     fileInput.addEventListener("change", (e) => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = ""; });
