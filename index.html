@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Copilot Agent Workflow Designer</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
+
 <body>
   <header class="toolbar">
     <div class="toolbar-left">
       <button class="btn mobile-only" id="btnTogglePalette" title="Show Blocks">☰ Blocks</button>
-      
-      <span class="brand">
+
+      <span class="brand hide-mobile">
         <span class="brand-dot"></span>
         Copilot Agent Workflow Designer
       </span>
+
       <input id="workflowName" class="workflow-name" type="text" value="Untitled workflow" spellcheck="false" />
+
+      <button class="btn mobile-only" id="btnTogglePanel" title="Show Properties">⚙️ Edit</button>
     </div>
     <div class="toolbar-right">
-      <button class="btn mobile-only" id="btnTogglePanel" title="Show Properties">⚙️ Edit</button>
-      
       <button class="btn" id="btnNew" title="Start a blank workflow">New</button>
       <button class="btn" id="btnImport" title="Load a saved .json workflow">Import</button>
       <input type="file" id="fileImport" accept="application/json" hidden />
       <span class="divider hide-mobile"></span>
       <button class="btn hide-mobile" id="btnExportJson" title="Download workflow as JSON">Export JSON</button>
       <button class="btn hide-mobile" id="btnExportPng" title="Download diagram as a PNG image">Export PNG</button>
-      <button class="btn btn-primary" id="btnExportDoc" title="Download a developer requirements document">Requirements Doc</button>
+      <button class="btn btn-primary" id="btnExportDoc" title="Download a developer requirements document">Requirements
+        Doc</button>
     </div>
   </header>
 
@@ -93,4 +97,5 @@
   <script src="js/exporters.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>

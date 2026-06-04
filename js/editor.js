@@ -17,11 +17,12 @@
   };
 
   let svg, viewport, gNodes, gEdges, tempEdge;
-  let onChange = () => {};          // app hooks autosave/counts here
-  let onSelect = () => {};          // app/panel hooks selection here
+  let onChange = () => { };          // app hooks autosave/counts here
+  let onSelect = () => { };          // app/panel hooks selection here
   let seq = 1;
 
-  const drag = { mode: null };      // 'node' | 'pan' | 'connect'
+  const drag = { mode: null };      // 'node' | 'pan' | 'connect' | 'pinch'
+  const activePointers = new Map(); // tracks touch points for pinch-to-zoom
 
   // ---- Helpers ----
   function uid(prefix) { return prefix + "_" + (Date.now().toString(36)) + "_" + (seq++); }
@@ -72,8 +73,10 @@
   function render() {
     gEdges.innerHTML = "";
     gNodes.innerHTML = "";
-    tempEdge = el("path", { id: "tempEdge", fill: "none", stroke: "#4ade80",
-      "stroke-width": 2.5, "stroke-dasharray": "6 4", "pointer-events": "none" });
+    tempEdge = el("path", {
+      id: "tempEdge", fill: "none", stroke: "#4ade80",
+      "stroke-width": 2.5, "stroke-dasharray": "6 4", "pointer-events": "none"
+    });
     gEdges.appendChild(tempEdge);
 
     state.edges.forEach(renderEdge);
@@ -86,10 +89,14 @@
   function renderEdge(edge) {
     const a = getNode(edge.from), b = getNode(edge.to);
     if (!a || !b) return;
-    const hit = el("path", { class: "edge-hit", d: edgePath(outPort(a), inPort(b)),
-      fill: "none", stroke: "transparent", "stroke-width": 14, cursor: "pointer" });
-    const line = el("path", { class: "edge-line", d: edgePath(outPort(a), inPort(b)),
-      fill: "none", stroke: "#4ade80", "stroke-width": 2.5 });
+    const hit = el("path", {
+      class: "edge-hit", d: edgePath(outPort(a), inPort(b)),
+      fill: "none", stroke: "transparent", "stroke-width": 14, cursor: "pointer"
+    });
+    const line = el("path", {
+      class: "edge-line", d: edgePath(outPort(a), inPort(b)),
+      fill: "none", stroke: "#4ade80", "stroke-width": 2.5
+    });
     hit.dataset.edge = edge.id;
     line.dataset.edge = edge.id;
     gEdges.appendChild(hit);
@@ -112,37 +119,49 @@
     const g = el("g", { class: "node", transform: `translate(${node.x} ${node.y})` });
     g.dataset.id = node.id;
 
-    g.appendChild(el("rect", { class: "node-rect", x: 0, y: 0, width: NODE_W, height: NODE_H,
-      rx: 12, fill: "#262636", stroke: t.color, "stroke-width": 1.5 }));
+    g.appendChild(el("rect", {
+      class: "node-rect", x: 0, y: 0, width: NODE_W, height: NODE_H,
+      rx: 12, fill: "#262636", stroke: t.color, "stroke-width": 1.5
+    }));
     // left accent bar
-    g.appendChild(el("rect", { x: 0, y: 0, width: 5, height: NODE_H, rx: 2, fill: t.color,
-      "pointer-events": "none" }));
+    g.appendChild(el("rect", {
+      x: 0, y: 0, width: 5, height: NODE_H, rx: 2, fill: t.color,
+      "pointer-events": "none"
+    }));
     // icon
     const icon = el("text", { x: 20, y: NODE_H / 2 + 7, "font-size": 22, "pointer-events": "none" });
     icon.textContent = t.icon;
     g.appendChild(icon);
     // title
-    const title = el("text", { class: "n-title", x: 48, y: 27, "font-size": 14,
+    const title = el("text", {
+      class: "n-title", x: 48, y: 27, "font-size": 14,
       "font-family": "Segoe UI, Arial, sans-serif", "font-weight": 600, fill: "#e6e6f0",
-      "pointer-events": "none" });
+      "pointer-events": "none"
+    });
     title.textContent = clip(node.name || t.label, 20);
     g.appendChild(title);
     // subtitle (primary config or type label)
-    const sub = el("text", { class: "n-sub", x: 48, y: 46, "font-size": 11.5,
-      "font-family": "Segoe UI, Arial, sans-serif", fill: "#9a9ab0", "pointer-events": "none" });
+    const sub = el("text", {
+      class: "n-sub", x: 48, y: 46, "font-size": 11.5,
+      "font-family": "Segoe UI, Arial, sans-serif", fill: "#9a9ab0", "pointer-events": "none"
+    });
     sub.textContent = clip(subtitleFor(node), 24);
     g.appendChild(sub);
 
     // input port (left)
-    g.appendChild(el("circle", { class: "port-in-vis", cx: 0, cy: NODE_H / 2, r: 5,
-      fill: "#1a1a24", stroke: t.color, "stroke-width": 2, "pointer-events": "none" }));
+    g.appendChild(el("circle", {
+      class: "port-in-vis", cx: 0, cy: NODE_H / 2, r: 5,
+      fill: "#1a1a24", stroke: t.color, "stroke-width": 2, "pointer-events": "none"
+    }));
     const inHit = el("circle", { class: "port-hit", cx: 0, cy: NODE_H / 2, r: 11, fill: "transparent" });
     inHit.dataset.portIn = node.id;
     g.appendChild(inHit);
 
     // output port (right)
-    g.appendChild(el("circle", { class: "port-out-vis", cx: NODE_W, cy: NODE_H / 2, r: 5,
-      fill: t.color, stroke: "#1a1a24", "stroke-width": 1.5, "pointer-events": "none" }));
+    g.appendChild(el("circle", {
+      class: "port-out-vis", cx: NODE_W, cy: NODE_H / 2, r: 5,
+      fill: t.color, stroke: "#1a1a24", "stroke-width": 1.5, "pointer-events": "none"
+    }));
     const outHit = el("circle", { class: "port-hit", cx: NODE_W, cy: NODE_H / 2, r: 11, fill: "transparent" });
     outHit.dataset.portOut = node.id;
     g.appendChild(outHit);
@@ -188,8 +207,10 @@
   // ---- Node / edge mutations ----
   function addNode(type, x, y) {
     const t = NODE_TYPES[type];
-    const node = { id: uid("node"), type, name: t.label,
-      x: Math.round(x), y: Math.round(y), config: Object.assign({}, t.defaults) };
+    const node = {
+      id: uid("node"), type, name: t.label,
+      x: Math.round(x), y: Math.round(y), config: Object.assign({}, t.defaults)
+    };
     state.nodes.push(node);
     renderNode(node);
     document.getElementById("emptyHint").hidden = true;
@@ -225,6 +246,19 @@
   function onPointerDown(e) {
     if (e.button === 2) return;        // let the context-menu handler deal with right-click
     e.preventDefault();                // stop the browser from starting a text selection
+
+    // Register pointer for pinch-to-zoom tracking
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    // If two fingers are down, switch to pinch mode
+    if (activePointers.size === 2) {
+      drag.mode = "pinch";
+      const pts = Array.from(activePointers.values());
+      drag.pinchDistance = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      svg.setPointerCapture(e.pointerId);
+      return;
+    }
+
     const portOut = e.target.dataset && e.target.dataset.portOut;
     const portIn = e.target.dataset && e.target.dataset.portIn;
     const nodeG = e.target.closest && e.target.closest(".node");
@@ -264,7 +298,25 @@
   }
 
   function onPointerMove(e) {
+    if (activePointers.has(e.pointerId)) {
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+
     if (!drag.mode) return;
+
+    if (drag.mode === "pinch" && activePointers.size === 2) {
+      const pts = Array.from(activePointers.values());
+      const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      if (drag.pinchDistance) {
+        const factor = currentDist / drag.pinchDistance;
+        const cx = (pts[0].x + pts[1].x) / 2;
+        const cy = (pts[0].y + pts[1].y) / 2;
+        zoomAt(cx, cy, factor);
+      }
+      drag.pinchDistance = currentDist;
+      return;
+    }
+
     if (drag.mode === "node") {
       const w = clientToWorld(e.clientX, e.clientY);
       const node = getNode(drag.id);
@@ -284,6 +336,24 @@
   }
 
   function onPointerUp(e) {
+    activePointers.delete(e.pointerId);
+
+    // If one finger lifts during pinch, seamlessly transition the remaining finger back to pan mode
+    if (drag.mode === "pinch" && activePointers.size < 2) {
+      drag.pinchDistance = null;
+      if (activePointers.size === 1) {
+        drag.mode = "pan";
+        const remainingId = Array.from(activePointers.keys())[0];
+        const pt = activePointers.get(remainingId);
+        drag.sx = pt.x; drag.sy = pt.y;
+        drag.vx = state.view.x; drag.vy = state.view.y;
+      } else {
+        drag.mode = null;
+        svg.classList.remove("panning");
+      }
+      return;
+    }
+
     if (drag.mode === "connect") {
       const target = document.elementFromPoint(e.clientX, e.clientY);
       const toId = target && target.dataset && target.dataset.portIn;
@@ -369,9 +439,11 @@
       zoomAt(r.left + r.width / 2, r.top + r.height / 2, f);
     },
     serialize() {
-      return { version: 1, name: state.name,
+      return {
+        version: 1, name: state.name,
         nodes: JSON.parse(JSON.stringify(state.nodes)),
-        edges: JSON.parse(JSON.stringify(state.edges)) };
+        edges: JSON.parse(JSON.stringify(state.edges))
+      };
     },
     load(data) {
       state.name = data.name || "Untitled workflow";
